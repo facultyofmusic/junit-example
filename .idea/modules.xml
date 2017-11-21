@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/basic-tests.iml" filepath="$PROJECT_DIR$/.idea/modules/basic-tests.iml" group="basic-tests" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/basic-tests/basic-tests_main.iml" filepath="$PROJECT_DIR$/.idea/modules/basic-tests/basic-tests_main.iml" group="basic-tests" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/basic-tests/basic-tests_test.iml" filepath="$PROJECT_DIR$/.idea/modules/basic-tests/basic-tests_test.iml" group="basic-tests" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/junit-example.iml" filepath="$PROJECT_DIR$/.idea/modules/junit-example.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/junit-example_main.iml" filepath="$PROJECT_DIR$/.idea/modules/junit-example_main.iml" group="junit-example" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/junit-example_test.iml" filepath="$PROJECT_DIR$/.idea/modules/junit-example_test.iml" group="junit-example" />
+    </modules>
+  </component>
+</project>

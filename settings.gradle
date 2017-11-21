@@ -1,0 +1,3 @@
+rootProject.name = 'junit-example'
+include 'basic-tests'
+
