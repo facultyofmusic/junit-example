@@ -1,15 +1,21 @@
-package facultyofmusic.example;
+package facultyofmusic.example.systemproperty;
 
-import facultyofmusic.example.SimpleTestRunner.RunWithPerson.Person;
+import facultyofmusic.example.SimpleUtilities;
+import facultyofmusic.example.systemproperty.SPRunner.RunWithPerson.Person;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import static org.junit.Assert.fail;
 
-@RunWith(SimpleTestRunner.class)
-public class SimpleTest {
+@RunWith(SPRunner.class)
+public class SPTest {
+
+    @Rule
+    public SPRule runnerRule = new SPRule();
+
     @Test
-    @SimpleTestRunner.RunWithPerson({Person.DANIEL})
+    @SPRunner.RunWithPerson({Person.DANIEL})
     public void addNumbers() {
         SimpleUtilities simple = new SimpleUtilities();
         int result = simple.getFive();
@@ -17,14 +23,14 @@ public class SimpleTest {
     }
 
     @Test
-    @SimpleTestRunner.RunWithPerson({
+    @SPRunner.RunWithPerson({
             Person.DANIEL,
             Person.STEFAN
     })
     public void subtractNumbers() throws Exception {
         SimpleUtilities simple = new SimpleUtilities();
         int result = simple.getTen();
-        Thread.sleep(10000);
+        Thread.sleep(1000);
         assert (result == 5);
     }
 

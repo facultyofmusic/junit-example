@@ -1,20 +1,17 @@
-package facultyofmusic.example;
+package facultyofmusic.example.extrarule;
 
+import org.junit.rules.TestRule;
 import org.junit.runner.Runner;
+import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.Suite;
-import org.junit.runners.model.FrameworkMethod;
-import org.junit.runners.model.InitializationError;
-import org.junit.runners.model.RunnerBuilder;
+import org.junit.runners.model.*;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 import java.lang.reflect.Method;
 import java.util.*;
 
-public class SimpleTestRunner extends Suite {
+public class ERRunner extends Suite {
     public static final RunWithPerson.Person[] DEFAULT_PERSON = {RunWithPerson.Person.DANIEL};
 
     @Retention(RetentionPolicy.RUNTIME)
@@ -27,9 +24,19 @@ public class SimpleTestRunner extends Suite {
         Person[] value();
     }
 
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.FIELD)
+    public @interface InjectPersonTestRule {
+    }
+
     private List<Runner> runners;
 
-    public SimpleTestRunner(Class<?> klass, RunnerBuilder builder) throws InitializationError {
+    @Override
+    protected List<Runner> getChildren() {
+        return runners;
+    }
+
+    public ERRunner(Class<?> klass, RunnerBuilder builder) throws InitializationError {
         super(klass, Collections.emptyList());
 
         Set<RunWithPerson.Person> relevantPeople = new TreeSet<>();
@@ -47,12 +54,16 @@ public class SimpleTestRunner extends Suite {
         }
     }
 
+
     private static class BSRunner extends BlockJUnit4ClassRunner {
         private final RunWithPerson.Person person;
+        private final String name;
 
         public BSRunner(Class<?> klass, RunWithPerson.Person person) throws InitializationError {
             super(klass);
             this.person = person;
+
+            this.name = "[" + person + "]";
         }
 
         @Override
@@ -63,12 +74,10 @@ public class SimpleTestRunner extends Suite {
                     methods.add(m);
                 }
             }
-            System.out.println(methods);
             return methods;
         }
 
         private boolean isPersonRelevant(FrameworkMethod method) {
-            System.out.println("> " + method + " compatible?");
             RunWithPerson annotation = method.getAnnotation(RunWithPerson.class);
             if (annotation == null || annotation.value().length == 0)
                 return Arrays.asList(DEFAULT_PERSON).contains(person);
@@ -83,12 +92,52 @@ public class SimpleTestRunner extends Suite {
 
         @Override
         protected String getName() {
-            return getTestClass().getName() + " [" + person + "]";
+            return "[" + person + "]";
         }
-    }
 
-    @Override
-    protected List<Runner> getChildren() {
-        return runners;
+        @Override
+        protected String testName(FrameworkMethod method) {
+            return method.getName() + getName();
+        }
+
+        @Override
+        protected Statement methodInvoker(FrameworkMethod method, Object test) {
+            List<TestRule> rules = getTestRules(test);
+            for(TestRule rule : rules) {
+                if (rule instanceof ERPersonReceiver) {
+                    ((ERPersonReceiver) rule).runnerAvailable(person);
+                }
+            }
+
+            return super.methodInvoker(method, test);
+        }
+
+        @Override
+        protected Statement classBlock(RunNotifier notifier) {
+            return childrenInvoker(notifier);
+        }
+
+        @Override
+        protected Annotation[] getRunnerAnnotations() {
+            return new Annotation[0];
+        }
+
+        @Override
+        protected Object createTest() throws Exception {
+            Object test = super.createTest();
+            return test;
+        }
+
+        private FrameworkField getSimpleTestRule() {
+            List<FrameworkField> personRuleFields = getTestClass().getAnnotatedFields(InjectPersonTestRule.class);
+            if (personRuleFields.size() != 1) {
+                System.err.println("There must be exactly 1 InjectPersonRule field per test class!");
+            }
+            FrameworkField field = personRuleFields.get(0);
+            if (field.getType() != ERRule.class) {
+                System.err.println("InjectPersonRule can only be used with ERRule!");
+            }
+            return field;
+        }
     }
 }
